@@ -1,0 +1,9 @@
+target/
+.git/
+.idea/
+.vscode/
+*.iml
+deploy/certs/
+deploy/k8s/02-haproxy-tls-secret.yaml
+port-forward.log
+port-forward.err

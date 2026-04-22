@@ -1,0 +1,12 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: haproxy-server
+  namespace: haproxy-demo
+spec:
+  selector:
+    app: haproxy-server
+  ports:
+    - name: https
+      port: 8443
+      targetPort: https-sidecar

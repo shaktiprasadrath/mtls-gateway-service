@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: haproxy-sidecar-config
+  namespace: haproxy-demo
+data:
+  haproxy.cfg: |
+    global
+      log stdout format raw local0 debug
+      maxconn 2048
+
+    defaults
+      mode http
+      log global
+      option httplog
+      log-format "%ci:%cp [%tr] %ft %b/%s %TR/%Tw/%Tc/%Tr/%Ta %ST %B ssl_version=%sslv ssl_cipher=%sslc sni=%{+Q}[ssl_fc_sni] client_verify=%[ssl_c_verify] client_cn=%{+Q}[ssl_c_s_dn(cn)] client_dn=%{+Q}[ssl_c_s_dn] \"%r\""
+      timeout connect 5s
+      timeout client 30s
+      timeout server 30s
+
+    frontend https_in
+      bind *:8443 ssl crt /usr/local/etc/haproxy/certs/tls.pem ca-file /usr/local/etc/haproxy/certs/ca.crt verify required
+      http-request set-header X-SSL-Client-Verify %[ssl_c_verify]
+      http-request set-header X-SSL-Client-DN %{+Q}[ssl_c_s_dn]
+      http-request set-header X-SSL-Client-CN %{+Q}[ssl_c_s_dn(cn)]
+      http-request set-header X-Forwarded-Proto https
+      default_backend app_backend
+
+    backend app_backend
+      option httpchk GET /capital/India
+      server app 127.0.0.1:8080 check

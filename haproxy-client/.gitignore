@@ -1,0 +1,5 @@
+.venv/
+generated/
+certs/*
+!certs/.gitkeep
+__pycache__/
